@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	blst "github.com/supranational/blst/bindings/go"
@@ -114,12 +115,20 @@ func deriveECDSAKey(seed []byte) {
 }
 
 func main() {
+	var mnemonic string
 
-	entropy, err := bip39.NewEntropy(256) // 24-word mnemonic
-	mnemonic, err := bip39.NewMnemonic(entropy)
-	if err != nil {
-		log.Fatalf("Failed to generate mnemonic: %v", err)
+	if len(os.Args) > 0 {
+		mnemonic = os.Args[1]
 	}
+
+	if mnemonic == "" {
+		entropy, err := bip39.NewEntropy(256) // 24-word mnemonic
+		mnemonic, err = bip39.NewMnemonic(entropy)
+		if err != nil {
+			log.Fatalf("Failed to generate mnemonic: %v", err)
+		}
+	}
+
 	fmt.Println("Mnemonic:", mnemonic)
 
 	if !bip39.IsMnemonicValid(mnemonic) {
